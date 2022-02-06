@@ -53,7 +53,7 @@ var page = template.Must(template.New("graphiql").Parse(`<!DOCTYPE html>
 </html>
 `))
 
-func New(c *fiber.Ctx, config ...Config) fiber.Handler {
+func New(config ...Config) fiber.Handler {
 	// Set default config
 	cfg := configDefault(config...)
 
