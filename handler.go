@@ -1,22 +1,28 @@
-package FiberGQLGen
+package fibergqlgen
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"net/http"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/errcode"
 	"github.com/99designs/gqlgen/graphql/executor"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/gofiber/fiber/v2"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 type Server struct {
-	exec *executor.Executor
+	transports []graphql.Transport
+	exec       *executor.Executor
+}
+
+func (s *Server) AddTransport(transport graphql.Transport) {
+	s.transports = append(s.transports, transport)
 }
 
 func (s *Server) SetErrorPresenter(f graphql.ErrorPresenterFunc) {
@@ -53,13 +59,13 @@ func (s *Server) AroundResponses(f graphql.ResponseMiddleware) {
 func NewDefaultServer(es graphql.ExecutableSchema) *Server {
 	srv := New(es)
 
-	//srv.AddTransport(transport.Websocket{
-	//	KeepAlivePingInterval: 10 * time.Second,
-	//})
-	//srv.AddTransport(transport.Options{})
-	//srv.AddTransport(transport.GET{})
-	//srv.AddTransport(transport.POST{})
-	//srv.AddTransport(transport.MultipartForm{})
+	srv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 10 * time.Second,
+	})
+	srv.AddTransport(transport.Options{})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
 
 	srv.SetQueryCache(lru.New(1000))
 
@@ -80,9 +86,9 @@ func New(es graphql.ExecutableSchema) *Server {
 func statusFor(errs gqlerror.List) int {
 	switch errcode.GetErrorKind(errs) {
 	case errcode.KindProtocol:
-		return http.StatusUnprocessableEntity
+		return fiber.StatusUnprocessableEntity
 	default:
-		return http.StatusOK
+		return fiber.StatusOK
 	}
 }
 
@@ -130,7 +136,7 @@ func (s *Server) ServeGraphQL(api *fiber.Ctx) error {
 		if err := recover(); err != nil {
 			err := s.exec.PresentRecoveredError(api.Context(), err)
 			resp := &graphql.Response{Errors: []*gqlerror.Error{err}}
-			api.Status(http.StatusUnprocessableEntity)
+			api.Status(fiber.StatusUnprocessableEntity)
 
 			return api.JSON(resp)
 		}
