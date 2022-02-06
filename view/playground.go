@@ -2,8 +2,9 @@ package view
 
 import (
 	"bytes"
-	"github.com/gofiber/fiber"
 	"html/template"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 var page = template.Must(template.New("graphiql").Parse(`<!DOCTYPE html>
@@ -58,7 +59,8 @@ func Playground(title string, endpoint string) []byte {
 	return body.Bytes()
 }
 
-func MountPlayground(c *fiber.Ctx) {
+func MountPlayground(c *fiber.Ctx) error {
 	c.Set("content-type", "text/html")
-	c.SendBytes(Playground("Something", "/query"))
+
+	return c.SendString(string(Playground("Something", "/query")))
 }

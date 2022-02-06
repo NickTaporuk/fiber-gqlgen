@@ -2,8 +2,9 @@ package view
 
 import (
 	"bytes"
-	"github.com/gofiber/fiber"
 	"html/template"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 var Visualize = `<!DOCTYPE html>
@@ -58,7 +59,8 @@ func Visualise(title string, endpoint string) []byte {
 	return body.Bytes()
 }
 
-func MountVisualDependencyGraph(c *fiber.Ctx) {
+func MountVisualDependencyGraph(c *fiber.Ctx) error {
 	c.Set("content-type", "text/html")
-	c.SendBytes(Visualise("Something", "/query"))
+
+	return c.SendString(string(Visualise("Something", "/query")))
 }

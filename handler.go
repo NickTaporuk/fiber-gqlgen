@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"net/http"
+
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/errcode"
 	"github.com/99designs/gqlgen/graphql/executor"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/vektah/gqlparser/v2/gqlerror"
-	"net/http"
 )
 
 type Server struct {
@@ -109,36 +110,37 @@ type ReturnSignal struct {
 	Response   *graphql.Response
 }
 
-func (s *Server) ServeGraphQL(api *fiber.Ctx) {
+func (s *Server) ServeGraphQL(api *fiber.Ctx) error {
 	var params graphql.RawParams
 
-	b := bytes.NewReader(api.Fasthttp.PostBody())
+	b := bytes.NewReader(api.Context().PostBody())
 
 	decoder := json.NewDecoder(b)
 	decoder.UseNumber()
 
 	if err := decoder.Decode(&params); err != nil {
-		_ = api.JSON(map[string]interface{}{
+		return api.JSON(map[string]interface{}{
 			"success":      false,
 			"message":      "Cannot Use Request. Ensure You have provided a valid schema.",
 			"returnStatus": "NOT_OK",
 		})
-		return
 	}
 
-	defer func() {
+	defer func(api *fiber.Ctx) error {
 		if err := recover(); err != nil {
-			err := s.exec.PresentRecoveredError(api.Fasthttp, err)
+			err := s.exec.PresentRecoveredError(api.Context(), err)
 			resp := &graphql.Response{Errors: []*gqlerror.Error{err}}
 			api.Status(http.StatusUnprocessableEntity)
-			_ = api.JSON(resp)
-			return
-		}
-	}()
 
-	childContext := graphql.StartOperationTrace(api.Fasthttp)
+			return api.JSON(resp)
+		}
+
+		return api.Next()
+	}(api)
+
+	childContext := graphql.StartOperationTrace(api.Context())
 	output := ProcessExecution(&params, s.exec, childContext)
 	api.Status(output.StatusCode)
-	_ = api.JSON(output.Response)
-	return
+
+	return api.JSON(output.Response)
 }
