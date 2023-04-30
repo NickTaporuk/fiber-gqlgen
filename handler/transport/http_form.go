@@ -9,8 +9,7 @@ import (
 	"strings"
 
 	"github.com/99designs/gqlgen/graphql"
-	fibergqlgen "github.com/efectn/fiber-gqlgen"
-	"github.com/gofiber/fiber/v2"
+	fibergqlgen "github.com/NickTaporuk/fiber-gqlgen"
 	"github.com/gofiber/fiber/v2/utils"
 )
 

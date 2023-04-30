@@ -8,10 +8,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/executor"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
-	"github.com/gofiber/fiber/v2"
-
-	fibergqlgen "github.com/efectn/fiber-gqlgen"
-	"github.com/efectn/fiber-gqlgen/handler/transport"
+	fibergqlgen "github.com/NickTaporuk/fiber-gqlgen"
+	"github.com/NickTaporuk/fiber-gqlgen/handler/transport"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 

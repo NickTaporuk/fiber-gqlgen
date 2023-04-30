@@ -2,8 +2,7 @@ package transport
 
 import (
 	"github.com/99designs/gqlgen/graphql"
-	fibergqlgen "github.com/efectn/fiber-gqlgen"
-	"github.com/gofiber/fiber/v2"
+	fibergqlgen "github.com/NickTaporuk/fiber-gqlgen"
 )
 
 // Options responds to http OPTIONS and HEAD requests
