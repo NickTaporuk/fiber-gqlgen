@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	fibergqlgen "github.com/NickTaporuk/fiber-gqlgen"
+	"github.com/gofiber/fiber/v2"
 )
 
 // POST implements the POST side of the default HTTP transport

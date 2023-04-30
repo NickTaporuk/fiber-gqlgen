@@ -11,6 +11,10 @@ type bytesReader struct {
 	prevRune int   // index of previous rune; or < 0
 }
 
+func (r *bytesReader) Seek(offset int64, whence int) (int64, error) {
+	return r.i, nil
+}
+
 func (r *bytesReader) Read(b []byte) (n int, err error) {
 	if r.s == nil {
 		return 0, errors.New("byte slice pointer is nil")

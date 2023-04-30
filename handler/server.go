@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	fibergqlgen "github.com/NickTaporuk/fiber-gqlgen"
 	"github.com/NickTaporuk/fiber-gqlgen/handler/transport"
+	"github.com/gofiber/fiber/v2"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -99,7 +100,7 @@ func (s *Server) ServeGraphQL(c *fiber.Ctx) error {
 	defer func() {
 		if err := recover(); err != nil {
 			err := s.exec.PresentRecoveredError(c.Context(), err)
-			resp := &graphql.Response{Errors: []*gqlerror.Error{err}}
+			resp := &graphql.Response{Errors: []*gqlerror.Error{err.(*gqlerror.Error)}}
 			c.Status(fiber.StatusUnprocessableEntity)
 
 			dErr = c.JSON(resp)
