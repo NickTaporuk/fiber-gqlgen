@@ -1,9 +1,9 @@
-module github.com/efectn/fiber-gqlgen
+module github.com/NickTaporuk/fiber-gqlgen
 
-go 1.16
+go 1.19
 
 require (
-	github.com/99designs/gqlgen v0.17.2
+	github.com/99designs/gqlgen v0.17.30
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/gofiber/fiber/v2 v2.31.0
 	github.com/gorilla/websocket v1.5.0 // indirect
